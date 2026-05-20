@@ -1,0 +1,22 @@
+public abstract class GameCharacter {
+    protected String name;
+    protected int level;
+    protected int hp;
+    protected int attackPower;
+
+    public GameCharacter(String name, int level) {
+        this.name = name;
+        this.level = level;
+    }
+
+    public String getName() { return name; }
+    public int getLevel() { return level; }
+    public int getHp() { return hp; }
+    public int getAttackPower() { return attackPower; }
+
+    // 스킬 발동 (직업별로 다르게 구현되며 최종 데미지를 반환)
+    public abstract int useSkill();
+    
+    // UI 출력을 위한 스킬명 반환용 메서드 (추가 편의성)
+    public abstract String getSkillName();
+}
