@@ -1,0 +1,74 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="com.game.system.BattleSystem" %>
+<%
+    // 1. 세션에서 게임 시스템(BattleSystem) 객체 가져오기
+    // (캐릭터 생성 UI에서 세션에 저장해둔 객체를 사용해야 생성된 캐릭터로 공격할 수 있습니다)
+    BattleSystem battleSystem = (BattleSystem) session.getAttribute("battleSystem");
+    
+    // 테스트를 위해 세션에 시스템이 없으면 새로 생성 (실제로는 캐릭터 생성에서 만들어져야 함)
+    if (battleSystem == null) {
+        battleSystem = new BattleSystem();
+        session.setAttribute("battleSystem", battleSystem);
+    }
+
+    String resultMessage = "";
+    
+    // 2. 몬스터 공격 요청 처리 (POST 요청일 때 동작)
+    if ("POST".equalsIgnoreCase(request.getMethod())) {
+        String inputId = request.getParameter("playerId");
+        
+        // 3. 전투 시스템으로 공격 요청 및 결과 반환
+        if (inputId != null && !inputId.trim().isEmpty()) {
+            resultMessage = battleSystem.attackMonster(inputId);
+        } else {
+            resultMessage = "플레이어 ID를 입력해주세요.";
+        }
+    }
+%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>몬스터 공격 UI</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; margin: 40px; }
+        .container { border: 2px solid #d32f2f; padding: 20px; width: 400px; border-radius: 8px; }
+        .result-box { background-color: #ffebee; color: #c62828; padding: 10px; margin-bottom: 20px; border-radius: 4px; font-weight: bold; }
+        .form-group { margin-bottom: 15px; }
+        button { background-color: #d32f2f; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; font-size: 16px; font-weight: bold; width: 100%; }
+        button:hover { background-color: #b71c1c; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>⚔️ 몬스터 공격</h2>
+
+        <!-- [화면 표시()] 공격 결과가 있을 경우 출력 -->
+        <% if (!resultMessage.isEmpty()) { %>
+            <div class="result-box">
+                <%= resultMessage %>
+            </div>
+        <% } %>
+
+        <!-- [공격버튼클릭()] 몬스터 공격 입력 폼 -->
+        <form method="POST" action="monster_attack.jsp">
+            <div class="form-group">
+                <label for="playerId">플레이어 ID (검증용):</label>
+                <input type="text" id="playerId" name="playerId" value="hero" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;" required>
+            </div>
+            
+            <button type="submit">공격하기</button>
+        </form>
+        
+        <hr style="margin-top:20px;">
+        <p style="font-size: 12px; color: #666;">
+            * 테스트 안내<br>
+            - ID에 <b>hero</b>를 입력하면 공격에 성공합니다.<br>
+            - 다른 ID를 입력하면 권한 없음으로 실패합니다.<br>
+            - 공격 전 반드시 캐릭터 생성 작업이 선행되어야 합니다.
+        </p>
+    </div>
+
+</body>
+</html>
