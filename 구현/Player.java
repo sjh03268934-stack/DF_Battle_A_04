@@ -1,0 +1,18 @@
+package Game;
+
+public class Player {
+    private String playerId;
+
+    public Player(String playerId) {
+        this.playerId = playerId;
+    }
+
+    public String getPlayerId() {
+        return playerId;
+    }
+
+    // 플레이어 권한 체크 (id == "hero")
+    public boolean checkPlayer(String id) {
+        return "hero".equals(id);
+    }
+}
