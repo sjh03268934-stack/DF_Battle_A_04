@@ -1,21 +1,25 @@
 ```mermaid
 flowchart LR
-    Player((플레이어))
-    
+    %% 액터 정의 (사람 모양 대신 직관적인 원형으로 표현)
+    Actor((플레이어))
+
     subgraph GameSystem [게임 시스템]
-        UC1([캐릭터 생성])
-        UC2([몬스터 공격])
-        UC3([플레이어 체크])
+    %% 유즈케이스 정의 (타원형)
+    UC1([캐릭터 생성])
+    UC2([몬스터 공격])
+    UC3([아이템 획득])
+    UC4([길드 가입])
+    UC5([플레이어 체크])
     end
     
-    Player --> UC1
-    Player --> UC2
-    
-    UC1 -. "&lt&ltinclude&gt&gt" .-> UC3
-    UC2 -. "&lt&ltinclude&gt&gt" .-> UC3
+    %% 액터와 유즈케이스 간의 관계 (기본 연관 관계)
+    Actor --> UC1
+    Actor --> UC2
+    Actor --> UC3
+    Actor --> UC4
 
-    
-    style Player fill:#f9f,stroke:#333,stroke-width:2px
-    style UC1 fill:#bbf,stroke:#333,stroke-width:2px
-    style UC2 fill:#bbf,stroke:#333,stroke-width:2px
-    style UC3 fill:#fbb,stroke:#333,stroke-width:2px
+    %% Include 관계 설정 (점선 화살표와 라벨 사용)
+    UC1 -.->|<<include>>| UC5
+    UC2 -.->|<<include>>| UC5
+    UC3 -.->|<<include>>| UC5
+    UC4 -.->|<<include>>| UC5
