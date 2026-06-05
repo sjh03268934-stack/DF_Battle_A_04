@@ -8,56 +8,59 @@ sequenceDiagram
     participant Inv as 인벤토리
     participant Item as 아이템
 
-    %% 사용자의 UI 조작
-    User->>UI: 아이템 정보 입력
+    User->>UI: 플레이어ID, 아이템명, 타입, 가치 입력
     activate UI
-    
-    %% 제어 클래스로 요청 (클래스 다이어그램의 메서드 매핑)
-    UI->>Control: 아이템획득()
+
+    UI->>Control: 아이템획득(playerId, itemName, type, value)
     activate Control
 
-    %% 1. 플레이어 검증 단계
-    Control->>Player: 플레이어체크(플레이어id)
+    %% 플레이어 검증
+    Control->>Player: 플레이어체크(playerId)
     activate Player
-    Player-->>Control: 검증 결과 반환 (true/false)
+    Player-->>Control: true / false
     deactivate Player
 
-    alt 검증 성공 (true)
-        %% 2. 아이템 가치 평가 및 객체 생성
-        Note over Control, Item: 가치에 따른 등급(전설/희귀/일반) 부여
-        Control->>Item: 객체 생성(아이템명, 타입, 가치, 등급)
-        activate Item
-        Item-->>Control: 아이템 객체 반환
-        deactivate Item
+    alt 플레이어 검증 실패
+        Control-->>UI: 획득 실패 (권한 없음)
 
-        %% 3. 캐릭터의 인벤토리 속성(멤버) 접근
-        Control->>Char: 인벤토리멤버 접근
-        activate Char
-        Char-->>Control: 인벤토리 객체 참조 반환
-        deactivate Char
+    else 플레이어 검증 성공
 
-        %% 4. 인벤토리에 아이템 추가 및 용량 검증
-        Control->>Inv: 아이템추가(item)
-        activate Inv
-        
-        Note over Inv: 인벤토리 최대용량 확인
-        
-        alt 아이템리스트 크기 < 최대용량
-            Inv->>Inv: 아이템리스트에 item 추가
-            Inv-->>Control: 추가 성공 (true)
-            Control-->>UI: 획득 성공 응답
-        else 아이템리스트 크기 >= 최대용량
-            Inv-->>Control: 추가 실패 (false)
-            Control-->>UI: 획득 실패 (공간 부족) 응답
+        alt 현재캐릭터 == null
+            Control-->>UI: 획득 실패 (캐릭터 없음)
+
+        else 현재캐릭터 존재
+
+            Control->>Item: new 아이템(name, type, value)
+            activate Item
+            Note over Item: 가치 기반 등급 자동 결정<br/>1000↑ 전설 / 500↑ 희귀 / 미만 일반
+            Item-->>Control: 아이템 객체
+            deactivate Item
+
+            Control->>Char: get인벤토리()
+            activate Char
+            Char-->>Control: 인벤토리 참조
+            deactivate Char
+
+            Control->>Inv: 아이템추가(item)
+            activate Inv
+
+            alt 현재 아이템 수 < 10
+                Inv->>Inv: 아이템리스트.add(item)
+                Inv-->>Control: true
+                Control-->>UI: 아이템 획득 성공
+            else 현재 아이템 수 >= 10
+                Inv-->>Control: false
+                Control-->>UI: 획득 실패 (인벤토리 가득 참)
+            end
+
+            deactivate Inv
+
         end
-        deactivate Inv
-        
-    else 검증 실패 (false)
-        Control-->>UI: 획득 실패 (권한 없음) 응답
+
     end
 
-    %% 5. 결과 화면 출력 (클래스 다이어그램의 메서드 매핑)
-    UI->>UI: 화면표시()
-    UI-->>User: 아이템 획득 최종 결과 출력
+    UI->>UI: 결과 메시지 출력
+    UI-->>User: 아이템 획득 결과 표시
+
     deactivate Control
     deactivate UI
