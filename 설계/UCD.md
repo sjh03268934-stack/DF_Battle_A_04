@@ -19,7 +19,7 @@ flowchart LR
     Actor --> UC4
 
     %% Include 관계 설정 (점선 화살표와 라벨 사용)
-    UC1 -.->|<<include>>| UC5
+    UC1 -.->|&lt;&lt;include>>| UC5
     UC2 -.->|<<include>>| UC5
     UC3 -.->|<<include>>| UC5
     UC4 -.->|<<include>>| UC5
